@@ -1,438 +1,295 @@
-# 🏠 Rental Properties - Full Stack Application
+# Rental Property API
 
-Complete property rental system with Django backend and Next.js frontend, featuring geolocation search, dynamic pricing, and comprehensive filtering.
+Django REST API for rental property management with geolocation search, dynamic pricing, and comprehensive filtering capabilities.
 
-## 🎯 Overview
+## 🎯 Features
 
-This project demonstrates a modern full-stack architecture with **separated frontend and backend** repositories that can be deployed independently.
+### Core Functionality
+- **RESTful API** - Complete CRUD operations for properties, bookings, and pricing
+- **Geolocation Search** - Find properties within radius using PostGIS spatial queries
+- **Advanced Filtering** - Filter by city, country, property type, price range, bedrooms, bathrooms, and guests
+- **Dynamic Pricing** - Seasonal pricing rules with custom multipliers per date range
+- **Property Management** - Support for multiple property types (Apartment, House, Villa, Loft, etc.)
+- **Booking System** - Track reservations with status management (confirmed, pending, cancelled)
+- **Rich Property Data** - Images, amenities, and detailed property information
 
-```
-┌─────────────────┐          ┌──────────────────┐
-│   Next.js       │  HTTP    │   Django API     │
-│   Frontend      │ ◄──────► │   Backend        │
-│   (Vercel)      │  REST    │   (Railway)      │
-└─────────────────┘          └──────────────────┘
-                                      │
-                              ┌───────▼────────┐
-                              │  PostgreSQL    │
-                              │  + PostGIS     │
-                              └────────────────┘
-```
-
-## 📦 Repository Structure
-
-This **monorepo** contains both applications for development purposes, but they should be deployed as **separate repositories** in production:
-
-```
-test-interview/                 (Current monorepo - for development only)
-├── backend/                   → Split into rental-properties-backend repo
-│   ├── config/
-│   ├── rentals/
-│   ├── requirements.txt
-│   ├── Procfile
-│   └── README.md
-├── frontend/                  → Split into rental-properties-frontend repo
-│   ├── app/
-│   ├── components/
-│   ├── lib/
-│   ├── package.json
-│   ├── vercel.json
-│   └── README.md
-├── sample-data.db            (Development data source)
-├── docker-compose.yml        (Development environment)
-└── README.md                 (This file)
-```
-
-## 🚀 Quick Start (Development)
-
-### For Local Development (Both Apps Together)
-
-Use this monorepo setup for local development:
-
-```bash
-# 1. Start both backend and frontend with Docker
-docker-compose up
-
-# 2. In a new terminal, run migrations
-docker-compose exec web python manage.py migrate
-
-# 3. Import sample data
-docker-compose exec web python manage.py import_data
-
-# Access the apps:
-# - Frontend: http://localhost:3000
-# - Backend API: http://localhost:8000/api
-# - Admin Panel: http://localhost:8000/admin
-```
-
-### For Production (Separate Deployments)
-
-Each application has its own README with deployment instructions:
-
-- **Backend:** See [backend/README.md](backend/README.md) - Deploy to Railway/Render
-- **Frontend:** See [frontend/README.md](frontend/README.md) - Deploy to Vercel
-
-## 📂 Splitting into Separate Repositories
-
-When you're ready to deploy, split this monorepo into two separate repositories:
-
-### 1. Create Backend Repository
-
-```bash
-# Create a new directory for backend repo
-mkdir rental-properties-backend
-cd rental-properties-backend
-
-# Initialize git
-git init
-
-# Copy backend files
-cp -r ../test-interview/backend/* .
-cp ../test-interview/sample-data.db .
-
-# Copy backend-specific files to root
-mv requirements.txt ../
-mv Procfile ../
-mv runtime.txt ../
-mv railway.json ../
-mv .env.example ../
-
-# Create .gitignore
-cat > .gitignore << 'EOF'
-# Python
-__pycache__/
-*.py[cod]
-*.so
-.Python
-venv/
-*.egg-info/
-
-# Django
-*.log
-db.sqlite3
-/staticfiles/
-
-# Environment
-.env
-.env.local
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-
-# Database
-*.db
-*.sqlite
-EOF
-
-# Commit
-git add .
-git commit -m "Initial backend commit"
-
-# Push to GitHub
-git remote add origin <your-backend-repo-url>
-git push -u origin main
-```
-
-### 2. Create Frontend Repository
-
-```bash
-# Create a new directory for frontend repo
-mkdir rental-properties-frontend
-cd rental-properties-frontend
-
-# Initialize git
-git init
-
-# Copy frontend files
-cp -r ../test-interview/frontend/* .
-
-# Create .env.example
-cat > .env.example << 'EOF'
-# Backend API URL
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
-EOF
-
-# Commit
-git add .
-git commit -m "Initial frontend commit"
-
-# Push to GitHub
-git remote add origin <your-frontend-repo-url>
-git push -u origin main
-```
-
-### 3. Update Cross-References
-
-After splitting:
-
-**In backend README.md**, update:
-```markdown
-**Frontend Repository:** https://github.com/your-username/rental-properties-frontend
-```
-
-**In frontend README.md**, update:
-```markdown
-**Backend Repository:** https://github.com/your-username/rental-properties-backend
-```
-
-## 🎯 Key Features
-
-### Backend (Django)
-- ✅ RESTful API with Django REST Framework
-- ✅ PostGIS geolocation with spatial indexes
-- ✅ Dynamic pricing with seasonal variations
-- ✅ Advanced filtering and search
-- ✅ Property availability checking
-- ✅ 100 sample properties with realistic data
-
-### Frontend (Next.js)
-- ✅ Interactive Leaflet map with markers
-- ✅ Real-time property filtering
-- ✅ Geolocation search (click-to-search)
-- ✅ Dynamic pricing calculation
-- ✅ Responsive design (mobile/tablet/desktop)
-- ✅ Date range selection
+### Technical Features
+- **PostGIS Integration** - Geographic queries with spatial indexes for fast location-based searches
+- **Sample Data** - Pre-loaded with 50+ realistic properties across multiple cities
+- **Admin Interface** - Django admin panel for easy data management
+- **Browsable API** - Interactive API documentation via Django REST Framework
+- **Production Ready** - Configured with Gunicorn, Whitenoise, and PostgreSQL
 
 ## 🛠️ Tech Stack
 
-### Backend
-- **Framework:** Django 4.2.7
-- **API:** Django REST Framework 3.14.0
-- **Database:** PostgreSQL 15 + PostGIS 3.3
-- **Server:** Gunicorn (production)
-- **Deployment:** Railway / Render
+- **Django 4.2.7** - Python web framework
+- **Django REST Framework 3.14.0** - RESTful API toolkit
+- **PostgreSQL 15 + PostGIS 3.3** - Database with geospatial support
+- **Gunicorn** - Production WSGI server
+- **Whitenoise** - Static file serving
+- **Python 3.11** - Programming language
 
-### Frontend
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Maps:** Leaflet + React Leaflet
-- **HTTP Client:** Axios
-- **Deployment:** Vercel
+## 🚀 Quick Start
 
-## 📚 Documentation
-
-Each application has comprehensive documentation:
-
-- **[Backend README](backend/README.md)** - API endpoints, setup, Django concepts
-- **[Frontend README](frontend/README.md)** - Components, deployment, features
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Detailed deployment guide for both apps
-
-## 🚀 Deployment Strategy
-
-### Recommended Deployment
-
-1. **Backend → Railway** (~$5/month)
-   - Built-in PostgreSQL + PostGIS
-   - Auto-deploys from Git
-   - Easy environment variable management
-   - Automatic SSL
-
-2. **Frontend → Vercel** (Free)
-   - Zero-config Next.js deployment
-   - Edge network (CDN)
-   - Auto-deploys from Git
-   - Preview deployments for PRs
-
-### Deployment Steps Summary
-
-**Backend (Railway):**
-```bash
-1. Push backend code to separate GitHub repo
-2. Create Railway project from GitHub
-3. Add PostgreSQL database
-4. Set environment variables
-5. Enable PostGIS extension
-6. Run migrations and import data
-```
-
-**Frontend (Vercel):**
-```bash
-1. Push frontend code to separate GitHub repo
-2. Import project on Vercel
-3. Set NEXT_PUBLIC_API_URL environment variable
-4. Deploy (automatic)
-5. Update backend CORS with Vercel URL
-```
-
-**Complete guide:** See [DEPLOYMENT.md](DEPLOYMENT.md)
-
-## 🔗 Local Development Setup
-
-### Option 1: Docker Compose (Recommended)
-
-Run both apps together:
+### Option 1: Local Development with Docker (Recommended)
 
 ```bash
-# Start all services
+# Clone the repository
+git clone <your-repo-url>
+cd test-interview
+
+# Start PostgreSQL and Django
 docker-compose up
 
-# Run backend migrations
+# In another terminal, run migrations
 docker-compose exec web python manage.py migrate
 
-# Import sample data
-docker-compose exec web python manage.py import_data
+# Load sample data
+docker-compose exec web python manage.py load_sample_data
 
 # Create admin user (optional)
 docker-compose exec web python manage.py createsuperuser
 ```
 
-Access:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000/api
-- Admin: http://localhost:8000/admin
+**Access the API:**
+- API Root: http://localhost:8000/
+- Properties List: http://localhost:8000/api/properties/
+- Admin Panel: http://localhost:8000/admin/
+- Browsable API: http://localhost:8000/api/
 
-### Option 2: Run Separately
+### Option 2: Local Development without Docker
 
-**Terminal 1 - Backend:**
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
+# Install PostgreSQL with PostGIS extension
+# macOS: brew install postgresql postgis
+# Ubuntu: sudo apt-get install postgresql-15 postgresql-15-postgis-3
+
+# Create database
+createdb rental_db
+psql rental_db -c "CREATE EXTENSION postgis;"
+
+# Setup Python environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Run migrations
+cd backend
 python manage.py migrate
-python manage.py import_data
+
+# Load sample data
+python manage.py load_sample_data
+
+# Run development server
 python manage.py runserver
 ```
 
-**Terminal 2 - Frontend:**
+## 📡 API Endpoints
+
+### Properties
+
 ```bash
-cd frontend
-npm install --legacy-peer-deps
-echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api" > .env.local
-npm run dev
+# List all properties with pagination
+GET /api/properties/
+
+# Filter properties
+GET /api/properties/?city=Berlin&property_type=Apartment&bedrooms=2&max_price=500
+
+# Get single property with details
+GET /api/properties/{id}/
+
+# Geolocation search (find properties within radius)
+GET /api/properties/nearby/?latitude=52.52&longitude=13.40&radius=5
+
+# Calculate price for date range
+GET /api/properties/{id}/calculate_price/?check_in=2025-06-15&check_out=2025-06-20
 ```
 
-## 🔍 API Examples
+### Health Check
 
 ```bash
-# List all properties
-curl http://localhost:8000/api/properties/
+# API status and configuration
+GET /
+```
 
-# Filter by city and type
-curl "http://localhost:8000/api/properties/?city=Berlin&property_type=Apartment"
+### Admin
 
-# Geolocation search
+```bash
+# Django admin panel
+GET /admin/
+```
+
+## 📊 API Response Examples
+
+### List Properties
+```json
+{
+  "count": 50,
+  "next": "http://localhost:8000/api/properties/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": 1,
+      "name": "Loft in Berlin",
+      "description": "Beautiful loft in central Berlin...",
+      "property_type": "Loft",
+      "address": "32057 Hill Haven",
+      "city": "Berlin",
+      "country": "Germany",
+      "latitude": 52.578296,
+      "longitude": 13.474558,
+      "bedrooms": 1,
+      "bathrooms": 1.5,
+      "max_guests": 2,
+      "base_price_per_night": 409.72,
+      "currency": "USD",
+      "images": [...],
+      "amenities": [...],
+      "created_at": "2025-11-10T17:01:11Z"
+    }
+  ]
+}
+```
+
+### Filter Examples
+```bash
+# Properties in Berlin
+curl "http://localhost:8000/api/properties/?city=Berlin"
+
+# Apartments with 2+ bedrooms under $300/night
+curl "http://localhost:8000/api/properties/?property_type=Apartment&bedrooms=2&max_price=300"
+
+# Properties for 4 guests
+curl "http://localhost:8000/api/properties/?min_guests=4"
+
+# Nearby search (5km radius)
 curl "http://localhost:8000/api/properties/nearby/?latitude=52.52&longitude=13.40&radius=5"
-
-# Dynamic pricing
-curl "http://localhost:8000/api/properties/1/calculate_price/?check_in=2025-06-15&check_out=2025-06-20"
 ```
 
-## 🐛 Troubleshooting
+## 🏗️ Project Structure
 
-### Backend Issues
-```bash
-# Check logs
-docker-compose logs web
-
-# Restart database
-docker-compose restart db
-
-# Re-import data
-docker-compose exec web python manage.py import_data --clear
+```
+test-interview/
+├── backend/
+│   ├── config/              # Django configuration
+│   │   ├── settings.py      # App settings
+│   │   ├── urls.py          # URL routing
+│   │   └── wsgi.py          # WSGI config
+│   ├── rentals/             # Main application
+│   │   ├── models.py        # Data models (Property, Booking, etc.)
+│   │   ├── views.py         # API views
+│   │   ├── serializers.py   # Data serialization
+│   │   ├── filters.py       # Query filters
+│   │   └── management/
+│   │       └── commands/
+│   │           └── load_sample_data.py  # Data loader
+│   └── manage.py            # Django CLI
+├── sample-data.db           # SQLite sample data
+├── requirements.txt         # Python dependencies
+├── Dockerfile              # Docker configuration
+├── docker-compose.yml      # Local development setup
+├── start.sh               # Production startup script
+└── README.md              # This file
 ```
 
-### Frontend Issues
+## 🚢 Railway Deployment
+
+Complete deployment guide: [RAILWAY_SETUP.md](RAILWAY_SETUP.md)
+
+**Quick Deploy:**
+
+1. Push to GitHub
+2. Create Railway project from repo
+3. Add PostgreSQL database
+4. Set environment variables:
+   ```bash
+   DJANGO_DEBUG=False
+   DJANGO_SECRET_KEY=<generate-secret-key>
+   DJANGO_ALLOWED_HOSTS=.railway.app
+   ```
+5. Deploy automatically handles:
+   - Database migrations
+   - Sample data loading
+   - Static file collection
+   - PostGIS setup
+
+**Live Demo:** https://rental-property-backend-production.up.railway.app/
+
+## 🔧 Available Management Commands
+
 ```bash
-# Check environment variable
-cat frontend/.env.local
+# Load sample data into database
+python manage.py load_sample_data
 
-# Reinstall dependencies
-cd frontend
-rm -rf node_modules .next
-npm install --legacy-peer-deps
+# Create superuser for admin panel
+python manage.py createsuperuser
 
-# Check API connectivity
+# Run database migrations
+python manage.py migrate
+
+# Collect static files
+python manage.py collectstatic
+```
+
+## 🧪 Testing the API
+
+```bash
+# Health check
+curl http://localhost:8000/
+
+# List properties
 curl http://localhost:8000/api/properties/
+
+# Get property details
+curl http://localhost:8000/api/properties/1/
+
+# Search by location
+curl "http://localhost:8000/api/properties/nearby/?latitude=52.52&longitude=13.40&radius=10"
+
+# Filter and search
+curl "http://localhost:8000/api/properties/?city=Berlin&bedrooms=2&max_price=400"
 ```
-
-### CORS Errors
-- Ensure backend `CORS_ALLOWED_ORIGINS` includes `http://localhost:3000`
-- Restart backend after changing `.env`
-
-## 📖 Learning Resources
-
-### For Node.js Developers Learning Django
-The backend code includes extensive comments comparing Django patterns to Node.js/Express equivalents.
-
-**Topics covered:**
-- Django vs Express routing
-- Django ORM vs Sequelize/Prisma
-- ViewSets vs Controllers
-- Serializers vs DTOs
-- Middleware comparison
-- Environment variable handling
-
-**See:** [backend/README.md](backend/README.md) for detailed comparisons
-
-## 🎓 Project Structure Explained
-
-### Monorepo (Development)
-Use this for:
-- Local development with Docker
-- Running both apps together
-- Quick prototyping
-- Learning and experimentation
-
-### Split Repos (Production)
-Use this for:
-- Independent deployments
-- Separate version control
-- Different team ownership
-- Scalability (deploy frontend/backend to different platforms)
 
 ## 📝 Environment Variables
 
-### Backend (.env)
 ```bash
-DJANGO_SECRET_KEY=your-secret-key
-DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=your-domain.com
+# Django Configuration
+DJANGO_SECRET_KEY=your-secret-key-here
+DJANGO_DEBUG=True  # False in production
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Database (Development)
+POSTGRES_DB=rental_db
+POSTGRES_USER=rental_user
+POSTGRES_PASSWORD=rental_password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+# Database (Production - Railway auto-provides this)
 DATABASE_URL=postgresql://...
-CORS_ALLOWED_ORIGINS=https://your-frontend.vercel.app
+
+# CORS (if frontend is on different domain)
+CORS_ALLOWED_ORIGINS=https://your-frontend.com
 ```
 
-### Frontend (.env.local)
-```bash
-NEXT_PUBLIC_API_URL=https://your-backend.up.railway.app/api
-```
+## 🎓 For Node.js Developers
 
-## 🤝 Contributing
+This project includes extensive code comments comparing Django patterns to Node.js/Express equivalents:
 
-This project demonstrates:
-- Full-stack development with Django + Next.js
-- Microservices architecture (separate frontend/backend)
-- PostGIS geospatial queries
-- RESTful API design
-- Modern deployment practices
+- **Models** → Sequelize/Prisma/TypeORM models
+- **Views** → Express controllers
+- **Serializers** → DTOs/validation schemas
+- **URLs** → Express routing
+- **Middleware** → Express middleware
 
-Feel free to use this as a template for your own projects!
+See inline comments in the code for detailed comparisons.
 
-## 📝 License
+## 📄 License
 
-MIT License - free to use for learning and commercial projects.
-
----
-
-## ⚡ Quick Reference
-
-| Task | Command |
-|------|---------|
-| Start both apps | `docker-compose up` |
-| Run migrations | `docker-compose exec web python manage.py migrate` |
-| Import data | `docker-compose exec web python manage.py import_data` |
-| View backend logs | `docker-compose logs -f web` |
-| View frontend logs | `docker-compose logs -f frontend` |
-| Access PostgreSQL | `docker-compose exec db psql -U rental_user -d rental_db` |
-| Stop all services | `docker-compose down` |
-
----
-
-**Built with ❤️ using Django, PostgreSQL, PostGIS, Next.js, and TypeScript**
-
-**Ready to deploy? See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions**
+MIT License - Free to use for learning and commercial projects
