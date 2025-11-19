@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with PostGIS extension
+  # Similar to using a postgres Docker image in Node.js projects
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: rental_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Init script to enable PostGIS extension
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - rental_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Application with hot reload
+  # Similar to nodemon in Node.js for auto-restart on file changes
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rental_django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      # Mount source code for hot reload (like nodemon with volume mounting)
+      - ./backend:/app/backend
+      - ./manage.py:/app/manage.py
+      - ./sample-data.db:/app/sample-data.db
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - rental_network
+
+  # Next.js Frontend Application
+  # Runs in development mode with hot reload
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rental_nextjs
+    volumes:
+      # Mount source for hot reload
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+    depends_on:
+      - web
+    networks:
+      - rental_network
+
+volumes:
+  postgres_data:
+
+networks:
+  rental_network:
+    driver: bridge
