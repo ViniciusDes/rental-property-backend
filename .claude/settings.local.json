@@ -8,7 +8,11 @@
       "Bash(npm install:*)",
       "Bash(sqlite3:*)",
       "Bash(curl:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(source test_env/bin/activate)",
+      "Bash(rm:*)",
+      "Bash(.test_venv/bin/pip install:*)",
+      "Bash(.test_venv/bin/python3:*)"
     ],
     "deny": [],
     "ask": []

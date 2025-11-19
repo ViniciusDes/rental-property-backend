@@ -24,6 +24,12 @@ DEBUG = config('DJANGO_DEBUG', default=True, cast=bool)
 # Similar to CORS allowed origins in Node.js
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# Allow all Railway domains in production
+if not DEBUG:
+    ALLOWED_HOSTS.append('.railway.app')
+    # Trust Railway's proxy headers
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 # Similar to registering routes/controllers in Express.js
 INSTALLED_APPS = [
@@ -58,18 +64,28 @@ MIDDLEWARE = [
 ]
 
 # CORS settings (similar to cors options in Express)
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only for development
-
-# Production CORS - use environment variable
-if not DEBUG:
-    CORS_ALLOWED_ORIGINS = config(
-        'CORS_ALLOWED_ORIGINS',
-        default='https://your-app.vercel.app'
-    ).split(',')
-else:
+if DEBUG:
+    # Development: Allow all origins
+    CORS_ALLOW_ALL_ORIGINS = True
     CORS_ALLOWED_ORIGINS = [
         "http://localhost:3000",  # React/Next.js frontend
         "http://localhost:8080",  # Vue frontend
+    ]
+else:
+    # Production: Configure based on environment variable
+    cors_origins = config('CORS_ALLOWED_ORIGINS', default='')
+    if cors_origins:
+        # If CORS_ALLOWED_ORIGINS is set, use it
+        CORS_ALLOWED_ORIGINS = cors_origins.split(',')
+        CORS_ALLOW_ALL_ORIGINS = False
+    else:
+        # If not set, allow all origins (API-only backend)
+        # Change this if you deploy a separate frontend
+        CORS_ALLOW_ALL_ORIGINS = True
+
+    # Allow CSRF from Railway domains
+    CSRF_TRUSTED_ORIGINS = [
+        'https://*.railway.app',
     ]
 
 ROOT_URLCONF = 'backend.config.urls'

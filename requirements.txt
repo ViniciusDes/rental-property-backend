@@ -7,6 +7,9 @@ djangorestframework==3.14.0
 # PostgreSQL adapter (similar to 'pg' package in Node.js)
 psycopg2-binary==2.9.9
 
+# Database URL parsing for production (Railway/Render auto-provide DATABASE_URL)
+dj-database-url==2.1.0
+
 # Environment variables support (similar to 'dotenv' in Node.js)
 python-decouple==3.8
 
@@ -24,3 +27,9 @@ django-extensions==3.2.3
 
 # Timezone support
 pytz==2023.3
+
+# Production server (similar to 'pm2' or running Node with cluster mode)
+gunicorn==21.2.0
+
+# Whitenoise for serving static files (similar to express.static)
+whitenoise==6.6.0

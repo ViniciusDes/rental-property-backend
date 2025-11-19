@@ -1,0 +1,18 @@
+# Don't upload these to Railway
+.git
+.env
+.env.example
+*.md
+docker-compose.yml
+Dockerfile
+frontend/
+test_env/
+.test_venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db-journal
+.DS_Store
+.vscode/
+.idea/
+*.log

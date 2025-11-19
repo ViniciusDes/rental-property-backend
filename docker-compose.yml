@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # PostgreSQL with PostGIS extension
@@ -51,27 +51,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - rental_network
-
-  # Next.js Frontend Application
-  # Runs in development mode with hot reload
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: rental_nextjs
-    volumes:
-      # Mount source for hot reload
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-    depends_on:
-      - web
     networks:
       - rental_network
 
